@@ -1,0 +1,30 @@
+# ملف الاستثناءات
+# التنسيق: نوع_الاستثناء: القيمة
+# الأنواع المدعومة: url, domain, path, param
+
+# روابط مستثناة
+url: https://example.com/admin
+url: https://example.com/login
+url: https://example.com/api/internal
+
+# نطاقات مستثناة
+domain: internal.example.com
+domain: dev.example.com
+domain: staging.example.com
+
+# مسارات مستثناة
+path: /admin
+path: /backup
+path: /api/internal
+path: /dev
+path: /test
+
+# معاملات مستثناة
+param: token
+param: csrf
+param: session
+param: password
+param: key
+param: secret
+param: auth
+param: apikey 

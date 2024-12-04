@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تقرير فحص الثغرات - {{.Target}}</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .summary {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .vulnerabilities {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .vulnerability {
+            border-bottom: 1px solid var(--light-color);
+            padding: 15px 0;
+        }
+
+        .vulnerability:last-child {
+            border-bottom: none;
+        }
+
+        .severity {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .severity.critical { background-color: #e74c3c; }
+        .severity.high { background-color: #e67e22; }
+        .severity.medium { background-color: #f39c12; }
+        .severity.low { background-color: #3498db; }
+        .severity.info { background-color: #95a5a6; }
+
+        .scanner-results {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .environment {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--dark-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .statistics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>تقرير فحص الثغرات</h1>
+            <p>الهدف: {{.Target}}</p>
+            <p>تاريخ الفحص: {{.StartTime.Format "2006-01-02 15:04:05"}}</p>
+            <p>المدة: {{.Duration}}</p>
+        </div>
+
+        <div class="summary">
+            <h2>ملخص النتائج</h2>
+            <div class="statistics">
+                <div class="stat-card">
+                    <h3>إجمالي الثغرات</h3>
+                    <p>{{.Statistics.TotalVulnerabilities}}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>معدل النجاح</h3>
+                    <p>{{printf "%.2f%%" .Statistics.SuccessRate}}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>عدد الفاحصات</h3>
+                    <p>{{len .ScannerResults}}</p>
+                </div>
+            </div>
+
+            <h3>توزيع الخطورة</h3>
+            <div class="statistics">
+                {{range $severity, $count := .Statistics.SeverityCounts}}
+                <div class="stat-card">
+                    <h4>{{$severity}}</h4>
+                    <p>{{$count}}</p>
+                </div>
+                {{end}}
+            </div>
+        </div>
+
+        <div class="vulnerabilities">
+            <h2>الثغرات المكتشفة</h2>
+            {{range .Vulnerabilities}}
+            <div class="vulnerability">
+                <h3>{{.Name}}</h3>
+                <span class="severity {{.Severity}}">{{.Severity}}</span>
+                <p><strong>الوصف:</strong> {{.Description}}</p>
+                <p><strong>الموقع:</strong> {{.Location}}</p>
+                <p><strong>التأثير:</strong> {{.Impact}}</p>
+                <p><strong>الحل:</strong> {{.Solution}}</p>
+                <p><strong>CVSS:</strong> {{.CVSS}}</p>
+                <p><strong>CWE:</strong> {{.CWE}}</p>
+                {{if .References}}
+                <p><strong>المراجع:</strong></p>
+                <ul>
+                    {{range .References}}
+                    <li><a href="{{.}}" target="_blank">{{.}}</a></li>
+                    {{end}}
+                </ul>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+
+        <div class="scanner-results">
+            <h2>نتائج الفاحصات</h2>
+            {{range $name, $result := .ScannerResults}}
+            <div class="vulnerability">
+                <h3>{{$name}}</h3>
+                <p><strong>النوع:</strong> {{$result.Type}}</p>
+                <p><strong>المدة:</strong> {{$result.Duration}}</p>
+                <p><strong>الحالة:</strong> {{$result.Status}}</p>
+                <p><strong>عدد النتائج:</strong> {{$result.Findings}}</p>
+                {{if $result.Error}}
+                <p><strong>الخطأ:</strong> {{$result.Error}}</p>
+                {{end}}
+            </div>
+            {{end}}
+        </div>
+
+        <div class="environment">
+            <h2>معلومات البيئة</h2>
+            <p><strong>نظام التشغيل:</strong> {{.Environment.OS}}</p>
+            <p><strong>الإصدار:</strong> {{.Environment.Version}}</p>
+            <h3>الفاحصات المستخدمة</h3>
+            <ul>
+                {{range .Environment.Scanners}}
+                <li>{{.}}</li>
+                {{end}}
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>تم إنشاء هذا التقرير بواسطة Vulne Scanner</p>
+            <p>معرف التقرير: {{.ID}}</p>
+        </div>
+    </div>
+</body>
+</html> 

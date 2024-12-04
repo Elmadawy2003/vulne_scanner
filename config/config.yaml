@@ -1,0 +1,110 @@
+# إعدادات الفحص الأمني
+scanner:
+  # إعدادات عامة
+  timeout: 30m
+  concurrent_scans: 10
+  max_depth: 5
+  user_agent: "VulneScanner/1.0.0"
+
+  # قائمة الفحوصات المفعلة
+  enabled_checks:
+    - xss
+    - sql_injection
+    - open_ports
+    - ssl_tls
+    - directory_traversal
+    - file_inclusion
+    - command_injection
+    - insecure_headers
+
+  # إعدادات الفحص المتقدمة
+  advanced:
+    follow_redirects: true
+    verify_ssl: true
+    max_redirects: 5
+    request_timeout: 10s
+    retry_attempts: 3
+    retry_delay: 5s
+
+# إعدادات الاستثناءات
+exclusions:
+  # ملف الاستثناءات
+  file: "config/exclusions.txt"
+  
+  # الروابط المستثناة مباشرة
+  urls:
+    - "https://example.com/admin"
+    - "https://example.com/login"
+  
+  # النطاقات المستثناة
+  domains:
+    - "internal.example.com"
+    - "dev.example.com"
+  
+  # المسارات المستثناة
+  paths:
+    - "/api/internal"
+    - "/admin"
+    - "/backup"
+  
+  # المعاملات المستثناة
+  params:
+    - "token"
+    - "csrf"
+    - "session"
+    - "password"
+
+# إعدادات التقارير
+reports:
+  formats:
+    - html
+    - json
+    - csv
+  include_details: true
+  include_recommendations: true
+  severity_levels:
+    - critical
+    - high
+    - medium
+    - low
+    - info
+
+# إعدادات السجلات
+logging:
+  level: info  # debug, info, warn, error
+  format: text # text, json
+  output: logs/scanner.log
+  max_size: 100  # بالميجابايت
+  max_backups: 3
+  max_age: 28    # بالأيام
+  compress: true
+
+# إعدادات الأمان
+security:
+  rate_limit: 100  # طلب في الدقيقة
+  max_payload_size: 1MB
+  allowed_protocols:
+    - http
+    - https
+  blocked_ips: []
+  api_keys: {}  # يتم تعبئتها من متغيرات البيئة
+
+# إعدادات التنبيهات
+alerts:
+  enabled: false
+  channels:
+    email:
+      enabled: false
+      smtp_server: ""
+      smtp_port: 587
+      username: ""
+      password: ""
+      from: ""
+      to: []
+    slack:
+      enabled: false
+      webhook_url: ""
+    telegram:
+      enabled: false
+      bot_token: ""
+      chat_id: "" 
